@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
 import { useAuth } from "../provider/AuthProvider";
 import { ProtectedRoute } from "./protectedRoute";
 import routes from "./routes";
@@ -6,11 +6,11 @@ import Oops404 from "../views/error/Oops404.jsx";
 import Login from "../views/public/auth/Login.jsx";
 import Register from "../views/public/auth/Register.jsx";
 import Profile from "../views/private/profile/Profile.jsx";
-import PublicHome from "../views/public/Home.jsx";
+import PublicHome from "../views/public/home/Home.jsx";
 import PrivateHome from "../views/private/Home.jsx";
 import Navbar from "../components/default/Navbar.jsx";
 import Shop from "../views/public/shop/Shop.jsx";
-import ArticleView from "../views/public/shop/ArticleView.jsx";
+import ArticleQuickView from "../views/public/home/ArticleQuickView.jsx";
 
 const Routes = () => {
     const { accessToken, user } = useAuth();
@@ -20,6 +20,10 @@ const Routes = () => {
         {
             path: "*",
             element: <Oops404 />,
+        },
+        {
+            path: routes.ALL,
+            element: <Navigate to={routes.HOME} />,
         },
     ];
 
@@ -52,12 +56,12 @@ const Routes = () => {
                     element: <PublicHome />,
                 },
                 {
-                    path: routes.SHOP,
-                    element: <Shop />,
+                    path: routes.HOME + "/:id",
+                    element: <PublicHome />,
                 },
                 {
-                    path: routes.SHOP + "/:id",
-                    element: <ArticleView />,
+                    path: routes.SHOP,
+                    element: <Shop />,
                 },
                 {
                     path: routes.AUTH,
@@ -66,10 +70,6 @@ const Routes = () => {
                 {
                     path: routes.REGISTER,
                     element: <Register />,
-                },
-                {
-                    path: routes.ALL,
-                    element: <PublicHome />,
                 },
             ]
         }

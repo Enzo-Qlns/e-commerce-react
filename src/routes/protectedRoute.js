@@ -1,14 +1,15 @@
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../provider/AuthProvider";
 import routes from "./routes";
-import ProgressBarProvider from "../provider/ProgressBarProvider";
 import { jwtDecode } from 'jwt-decode';
 import authService from "../api/authService";
 import Navbar from "../components/default/Navbar";
+import { useLocation } from "react-router-dom";
 
 export const ProtectedRoute = () => {
     const { accessToken, refreshToken, user, setAccessToken, setRefreshToken } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     // Check if the user is authenticated
     if (!accessToken) {
@@ -40,7 +41,6 @@ export const ProtectedRoute = () => {
             };
         };
     }
-
     // If authenticated, render the child routes
     return (
         <Navbar isConnected={true}>

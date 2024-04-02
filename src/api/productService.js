@@ -11,5 +11,9 @@ const productService = {
             return http.call(HOST + "/products?offset=" + offset + "&limit=" + limit, options, onResponse);
         }
     },
+    get_one_product(id, onResponse = undefined) {
+        const options = http.defaultOptions();
+        return http.call(HOST + "/products/" + id, options, onResponse);
+    },
 }
 export default productService;

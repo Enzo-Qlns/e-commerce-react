@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import CartsProvider from "./CartProvider";
 
 const AuthContext = createContext();
 
@@ -54,7 +55,9 @@ const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={contextValue}>
-            {children}
+            <CartsProvider>
+                {children}
+            </CartsProvider>
         </AuthContext.Provider>
     );
 };

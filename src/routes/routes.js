@@ -4,6 +4,6 @@ const routes = {
     HOME: '/home',
     SHOP: '/shop',
     PROFILE: '/profile',
-    ALL: '*'
+    ALL: '/'
 }
 export default routes;

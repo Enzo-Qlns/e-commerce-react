@@ -4,7 +4,7 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import routes from "../../routes/routes.js"
 import { Button } from 'flowbite-react'
-import ShoppingCarts from '../cart/ShoppingCarts.jsx'
+import ShoppingCarts from '../shop/ShoppingCarts.jsx'
 import ProgressBarProvider from '../../provider/ProgressBarProvider.js'
 
 function classNames(...classes) {
@@ -133,12 +133,10 @@ export default function Navbar({ isConnected, children }) {
                         </>
                     )}
                 </Disclosure>
-                <main>
-                    <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-                        <ProgressBarProvider>
-                            {children}
-                        </ProgressBarProvider>
-                    </div>
+                <main className="mx-auto max-w-7xl p-6 sm:p-6 lg:p-8">
+                    <ProgressBarProvider>
+                        {children}
+                    </ProgressBarProvider>
                 </main>
             </>
         )
@@ -237,12 +235,10 @@ export default function Navbar({ isConnected, children }) {
                     </>
                 )}
             </Disclosure>
-            <main>
-                <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{
-                    <ProgressBarProvider>
-                        <Outlet />
-                    </ProgressBarProvider>
-                }</div>
+            <main className="mx-auto max-w-7xl p-6 sm:p-6 lg:p-8">
+                <ProgressBarProvider>
+                    <Outlet />
+                </ProgressBarProvider>
             </main>
         </>
     )
