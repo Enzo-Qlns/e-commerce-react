@@ -6,15 +6,15 @@ import routes from "../../routes/routes.js"
 import { Button } from 'flowbite-react'
 import ShoppingCarts from '../shop/ShoppingCarts.jsx'
 import ProgressBarProvider from '../../provider/ProgressBarProvider.js'
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
+import { HiShoppingBag } from "react-icons/hi";
+import { useCarts } from '../../provider/CartProvider.js'
+import Utils from '../../utils/Utils.js'
 
 export default function Navbar({ isConnected, children }) {
     const location = useLocation();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const navigate = useNavigate();
+    const { carts } = useCarts();
 
     if (isConnected) {
         return (
@@ -43,7 +43,7 @@ export default function Navbar({ isConnected, children }) {
                                             <div className="flex space-x-4">
                                                 <Link
                                                     to={routes.HOME}
-                                                    className={classNames(
+                                                    className={Utils.classNames(
                                                         location.pathname.includes(routes.HOME) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                         'rounded-md px-3 py-2 text-sm font-medium'
                                                     )}
@@ -53,7 +53,7 @@ export default function Navbar({ isConnected, children }) {
                                                 </Link>
                                                 <Link
                                                     to={routes.SHOP}
-                                                    className={classNames(
+                                                    className={Utils.classNames(
                                                         location.pathname === routes.SHOP ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                         'rounded-md px-3 py-2 text-sm font-medium'
                                                     )}
@@ -63,7 +63,7 @@ export default function Navbar({ isConnected, children }) {
                                                 </Link>
                                                 <Link
                                                     to={routes.PROFILE}
-                                                    className={classNames(
+                                                    className={Utils.classNames(
                                                         location.pathname.includes(routes.PROFILE) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                         'rounded-md px-3 py-2 text-sm font-medium'
                                                     )}
@@ -96,7 +96,7 @@ export default function Navbar({ isConnected, children }) {
                             <Disclosure.Panel className="sm:hidden">
                                 <div className="space-y-1 px-2 pb-3 pt-2">
                                     <Disclosure.Button
-                                        className={classNames(
+                                        className={Utils.classNames(
                                             location.pathname.includes(routes.HOME) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                             'block rounded-md px-3 py-2 text-base font-medium'
                                         )}
@@ -107,7 +107,7 @@ export default function Navbar({ isConnected, children }) {
                                         </Link>
                                     </Disclosure.Button>
                                     <Disclosure.Button
-                                        className={classNames(
+                                        className={Utils.classNames(
                                             location.pathname.includes(routes.SHOP) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                             'block rounded-md px-3 py-2 text-base font-medium'
                                         )}
@@ -118,7 +118,7 @@ export default function Navbar({ isConnected, children }) {
                                         </Link>
                                     </Disclosure.Button>
                                     <Disclosure.Button
-                                        className={classNames(
+                                        className={Utils.classNames(
                                             location.pathname.includes(routes.PROFILE) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                             'block rounded-md px-3 py-2 text-base font-medium'
                                         )}
@@ -133,7 +133,7 @@ export default function Navbar({ isConnected, children }) {
                         </>
                     )}
                 </Disclosure>
-                <main className="mx-auto max-w-7xl p-6 sm:p-6 lg:p-8">
+                <main className="mx-auto p-6 sm:p-6 lg:p-8">
                     <ProgressBarProvider>
                         {children}
                     </ProgressBarProvider>
@@ -144,7 +144,7 @@ export default function Navbar({ isConnected, children }) {
 
     return (
         <>
-            <Disclosure as="nav" className="bg-gray-800">
+            <Disclosure as="nav" className="fixed w-full z-10 bg-gray-800">
                 {({ open }) => (
                     <>
                         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -168,7 +168,7 @@ export default function Navbar({ isConnected, children }) {
                                         <div className="flex space-x-4">
                                             <Link
                                                 to={routes.HOME}
-                                                className={classNames(
+                                                className={Utils.classNames(
                                                     location.pathname.includes(routes.HOME) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                     'rounded-md px-3 py-2 text-sm font-medium'
                                                 )}
@@ -178,7 +178,7 @@ export default function Navbar({ isConnected, children }) {
                                             </Link>
                                             <Link
                                                 to={routes.SHOP}
-                                                className={classNames(
+                                                className={Utils.classNames(
                                                     location.pathname.includes(routes.SHOP) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                     'rounded-md px-3 py-2 text-sm font-medium'
                                                 )}
@@ -190,7 +190,13 @@ export default function Navbar({ isConnected, children }) {
                                     </div>
                                 </div>
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                                    <Menu as="div" className="relative ml-3">
+                                    <Menu as="div" className="flex items-center justify-between w-40 relative ml-3">
+                                        <button onClick={() => setIsDrawerOpen(true)} type="button" className="relative inline-flex items-center">
+                                            <HiShoppingBag size={30} />
+                                            <div className="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-cyan-600 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
+                                                {Utils.objSize(carts)}
+                                            </div>
+                                        </button>
                                         <Button
                                             size={"sm"}
                                             onClick={() => navigate(routes.AUTH)}
@@ -209,7 +215,7 @@ export default function Navbar({ isConnected, children }) {
                         <Disclosure.Panel className="sm:hidden">
                             <div className="space-y-1 px-2 pb-3 pt-2">
                                 <Disclosure.Button
-                                    className={classNames(
+                                    className={Utils.classNames(
                                         location.pathname.includes(routes.HOME) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                         'block rounded-md px-3 py-2 text-base font-medium'
                                     )}
@@ -220,7 +226,7 @@ export default function Navbar({ isConnected, children }) {
                                     </Link>
                                 </Disclosure.Button>
                                 <Disclosure.Button
-                                    className={classNames(
+                                    className={Utils.classNames(
                                         location.pathname === routes.SHOP ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                         'block rounded-md px-3 py-2 text-base font-medium'
                                     )}
@@ -235,7 +241,7 @@ export default function Navbar({ isConnected, children }) {
                     </>
                 )}
             </Disclosure>
-            <main className="mx-auto max-w-7xl p-6 sm:p-6 lg:p-8">
+            <main className="mx-auto p-6 pt-20 sm:p-6 sm:pt-20 lg:p-8 lg:pt-20">
                 <ProgressBarProvider>
                     <Outlet />
                 </ProgressBarProvider>

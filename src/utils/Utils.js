@@ -40,6 +40,28 @@ const Utils = {
     isOnPhone() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     },
+    classNames(...classes) {
+        return classes.filter(Boolean).join(' ')
+    },
+    // Fonction pour ajouter des paramètres de requête à l'URL actuelle
+    addQueryParam(pathname, key, value) {
+        const location = window.location;
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set(key, value);
+        const newSearch = searchParams.toString();
+        return `${pathname}?${newSearch}`;
+    },
+    removeDuplicatesCategories(arr) {
+        const seen = new Set();
+        return arr.filter(obj => {
+            const key = obj.name;
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
+    },
     async getUserInfo() {
         return new Promise(async (resolve, reject) => {
             const userInfo = {};

@@ -3,12 +3,12 @@ import { HOST } from "./constants";
 import http from "./http";
 
 const productService = {
-    get_products(offset, limit, onResponse = undefined) {
+    get_products(query, onResponse = undefined) {
         const options = http.defaultOptions();
-        if (Utils.isEmpty(offset, limit)) {
+        if (Utils.isEmpty(query)) {
             return http.call(HOST + "/products", options, onResponse);
         } else {
-            return http.call(HOST + "/products?offset=" + offset + "&limit=" + limit, options, onResponse);
+            return http.call(HOST + "/products"+query, options, onResponse);
         }
     },
     get_one_product(id, onResponse = undefined) {

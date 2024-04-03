@@ -32,7 +32,8 @@ export default function PublicHome() {
     }
 
     const fetchProducts = () => {
-        productService.get_products(0, 8, (statusCode, jsonRes) => {
+        let query = "?offset=0&limit=10";
+        productService.get_products(query, (statusCode, jsonRes) => {
             displayProgressBar(false);
 
             if (200 === statusCode) {
@@ -84,22 +85,21 @@ export default function PublicHome() {
                         fetchProducts();
                     }}
                     onAddCarts={(productAdded) => {
-                        const existingProductIndex = carts.findIndex(item => JSON.parse(item).id === productAdded.id);
+                        const existingProductIndex = carts.findIndex(item => item.id === productAdded.id);
                         if (existingProductIndex !== -1) {
                             const updatedCarts = [...carts];
-                            const existingProduct = JSON.parse(updatedCarts[existingProductIndex]);
+                            const existingProduct = updatedCarts[existingProductIndex];
                             existingProduct.quantity += productAdded.quantity;
-                            updatedCarts[existingProductIndex] = JSON.stringify(existingProduct);
+                            updatedCarts[existingProductIndex] = existingProduct;
                             setCarts(updatedCarts);
                         } else {
                             // Le produit n'existe pas encore dans le panier, on l'ajoute alors
-                            setCarts([...carts, JSON.stringify(productAdded)]);
+                            setCarts([...carts, productAdded]);
                         }
                         navigate(routes.HOME);
                         setDisplayQuickPreview(false);
                         fetchProducts();
                     }}
-
                 />
             )}
             {/* End QuickPreview */}
@@ -205,17 +205,19 @@ export default function PublicHome() {
                         ))}
                     </div>
                     : <div className="space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:space-y-0">
-                        {categories.map((categorie) => (
-                            <div data-aos="zoom-in" key={categorie.id} className="group relative">
+                        {categories.map((category) => (
+                            <div data-aos="zoom-in" key={category?.id} className="group relative">
                                 <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
-                                    <img
-                                        src={categorie.image}
-                                        alt={"image de " + categorie.name}
-                                        className="h-full w-full object-cover object-center"
-                                    />
+                                    <Link to={Utils.addQueryParam(routes.SHOP, 'categoryId', category?.id)}>
+                                        <img
+                                            src={category?.image}
+                                            alt={"image de " + category?.name}
+                                            className="h-full w-full object-cover object-center"
+                                        />
+                                    </Link>
                                 </div>
                                 <h3 className="mt-1 mb-6 text-sm text-gray-400">
-                                    {categorie.name}
+                                    {category?.name}
                                 </h3>
                             </div>
                         ))}
