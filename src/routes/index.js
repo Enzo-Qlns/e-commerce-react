@@ -10,7 +10,6 @@ import PublicHome from "../views/public/home/Home.jsx";
 import PrivateHome from "../views/private/Home.jsx";
 import Navbar from "../components/default/Navbar.jsx";
 import Shop from "../views/public/shop/Shop.jsx";
-import ArticleQuickView from "../views/public/home/ArticleQuickView.jsx";
 
 const Routes = () => {
     const { accessToken, user } = useAuth();

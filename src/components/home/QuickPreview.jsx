@@ -2,9 +2,6 @@ import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Badge, Carousel } from "flowbite-react";
-import { Button } from "flowbite-react";
-import { HiAdjustments, HiMinusCircle, HiOutlinePlusCircle, HiCloudDownload, HiUserCircle } from "react-icons/hi";
-
 
 export default function QuickPreview({
     product,
@@ -14,17 +11,29 @@ export default function QuickPreview({
 }) {
     const [quantity, setQuantity] = useState(1)
 
+    const resetQuantity = () => {
+        setTimeout(() => {
+            setQuantity(1);
+        }, 250);
+    }
+
+    const handleClose = () => {
+        onClose();
+        resetQuantity();
+    }
+
     const submit = (e) => {
         const data = new FormData(e.currentTarget);
         e.preventDefault()
 
         product["quantity"] = Number.parseInt(data.get('quantity'))
         onAddCarts(product);
+        resetQuantity();
     }
 
     return (
         <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={onClose}>
+            <Dialog as="div" className="relative z-10" onClose={handleClose}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -53,7 +62,7 @@ export default function QuickPreview({
                                     <button
                                         type="button"
                                         className="absolute right-4 top-4 text-gray-400 hover:text-gray-500 sm:right-6 sm:top-8 md:right-6 md:top-6 lg:right-8 lg:top-8"
-                                        onClick={onClose}
+                                        onClick={handleClose}
                                     >
                                         <span className="sr-only">Close</span>
                                         <XMarkIcon className="h-6 w-6" aria-hidden="true" />

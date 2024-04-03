@@ -3,7 +3,10 @@ import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
 import { useProgressBar } from "../../../provider/ProgressBarProvider";
-import { useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import categorieService from '../../../api/categorieService';
+import { toast } from 'react-toastify';
+import routes from '../../../routes/routes';
 
 const sortOptions = [
     { name: 'Most Popular', href: '#', current: true },
@@ -63,12 +66,26 @@ function classNames(...classes) {
 
 export default function Shop() {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+    const [categories, setCategories] = useState(null);
     const { displayProgressBar } = useProgressBar();
-    const { id } = useParams();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+
+    const fetchCategories = () => {
+        categorieService.get_categories((statusCode, jsonRes) => {
+            displayProgressBar(false);
+
+            if (200 === statusCode) {
+                setCategories(jsonRes);
+            } else {
+                toast.error("Une erreur est survenue, veuillez réessayer ultérieurement");
+            };
+        });
+    }
 
     useEffect(() => {
-        displayProgressBar(false);
-    })
+        fetchCategories();
+    }, []);
 
     return (
         <div className="bg-slate-800 rounded-lg">
@@ -114,11 +131,11 @@ export default function Shop() {
                                 <form className="roundmt-4 border-t border-gray-200">
                                     <h3 className="sr-only">Categories</h3>
                                     <ul role="list" className="px-2 py-3 font-medium text-gray-500">
-                                        {subCategories.map((category) => (
+                                        {categories && categories.map((category) => (
                                             <li key={category.name}>
-                                                <a href={category.href} className="block px-2 py-3">
+                                                <Link to={routes.SHOP + "?catgeory=" + categories} className="block px-2 py-3">
                                                     {category.name}
-                                                </a>
+                                                </Link>
                                             </li>
                                         ))}
                                     </ul>
@@ -245,9 +262,17 @@ export default function Shop() {
                         <form className="hidden lg:block">
                             <h3 className="sr-only">Categories</h3>
                             <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-400">
-                                {subCategories.map((category) => (
-                                    <li key={category.name}>
-                                        <a href={category.href}>{category.name}</a>
+                                {categories && categories.map((category) => (
+                                    <li key={category.id}>
+                                        <Link
+                                            to={routes.SHOP + "?category=" + category.name}
+                                            className={classNames(
+                                                query.get('category') === category.name ? 'bg-gray-900' : 'border-transparent',
+                                                "block rounded-md px-3 py-2 text-sm font-medium text-white px-2 py-3")
+                                            }
+                                        >
+                                            {category.name}
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>
@@ -300,7 +325,7 @@ export default function Shop() {
                         <div className="lg:col-span-3">{/* Your content */}</div>
                     </div>
                 </section>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
