@@ -15,7 +15,6 @@ export default function PublicHome() {
     const [productPreview, setProductPreview] = useState(null);
     const navigate = useNavigate();
     const { carts, setCarts } = useCarts();
-    console.log(carts)
     const { displayProgressBar } = useProgressBar();
     const location = useLocation();
     const query = new URLSearchParams(location.search);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../provider/AuthProvider';
 import routes from '../../../routes/routes';
@@ -7,11 +7,13 @@ import Utils from '../../../utils/Utils';
 import { jwtDecode } from 'jwt-decode';
 import { Button } from 'flowbite-react';
 import { AiOutlineLoading } from "react-icons/ai";
+import { useProgressBar } from "../../../provider/ProgressBarProvider";
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { setAccessToken, setRefreshToken, setUser } = useAuth();
+    const { displayProgressBar } = useProgressBar();
     const navigate = useNavigate();
     const location = useLocation();
     const query = new URLSearchParams(location.search);
@@ -56,9 +58,15 @@ export default function Login() {
         });
     };
 
+    useEffect(() => {
+        setTimeout(() => {
+            displayProgressBar(false);
+        }, 250);
+    }, []);
+
     return (
         <div className="flex flex-col items-center mt-2 mx-auto lg:py-0">
-            <div href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
                 E-commerce React
             </div>
             {noConnected && (
