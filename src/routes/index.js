@@ -11,7 +11,7 @@ import PrivateHome from "../views/private/home/Home.jsx";
 import PublicHome from "../views/public/home/Home.jsx";
 import PublicShop from "../views/public/shop/Shop.jsx";
 import PrivateShop from "../views/private/shop/Shop.jsx";
-import OrdreSummary from "../views/private/shop/OrderSummary.jsx";
+import Summary from "../views/private/summary/Summary.jsx";
 
 const Routes = () => {
     const { accessToken, user } = useAuth();
@@ -44,7 +44,7 @@ const Routes = () => {
                 },
                 {
                     path: routes.SUMMARY,
-                    element: <OrdreSummary />,
+                    element: <Summary />,
                 },
                 {
                     path: routes.PROFILE,
