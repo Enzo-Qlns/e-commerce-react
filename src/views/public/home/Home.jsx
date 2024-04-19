@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useProgressBar } from "../../../provider/ProgressBarProvider";
 import categorieService from "../../../api/categorieService";
 import { toast } from "react-toastify";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import productService from "../../../api/productService";
 import routes from "../../../routes/routes";
 import Utils from "../../../utils/Utils";
@@ -12,12 +12,13 @@ import { useCarts } from "../../../provider/CartProvider";
 export default function PublicHome() {
     const [categories, setCategories] = useState(null);
     const [products, setProducts] = useState(null);
-    const [product, setProduct] = useState(null);
+    const [productPreview, setProductPreview] = useState(null);
     const navigate = useNavigate();
-    const [displayQuickPreview, setDisplayQuickPreview] = useState(false);
     const { carts, setCarts } = useCarts();
+    console.log(carts)
     const { displayProgressBar } = useProgressBar();
-    const { id } = useParams();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
 
     const fetchCategories = () => {
         categorieService.get_categories((statusCode, jsonRes) => {
@@ -32,33 +33,19 @@ export default function PublicHome() {
     }
 
     const fetchProducts = () => {
-        let query = "?offset=0&limit=10";
-        productService.get_products(query, (statusCode, jsonRes) => {
+        let q = "?offset=0&limit=10";
+        productService.get_products(q, (statusCode, jsonRes) => {
             displayProgressBar(false);
 
             if (200 === statusCode) {
+                let productId = query.get('productId');
+                setProductPreview(jsonRes?.find(product => product?.id?.toString() === productId?.toString()));
+
                 setProducts(jsonRes);
             } else {
                 toast.error("Une erreur est survenue, veuillez réessayer ultérieure");
             };
         });
-    }
-
-    const fetchProduct = () => {
-        displayProgressBar(true);
-
-        if (!Utils.isEmpty(id)) {
-            productService.get_one_product(id, (statusCode, jsonRes) => {
-                displayProgressBar(false);
-
-                if (200 === statusCode) {
-                    setProduct(jsonRes);
-                    setDisplayQuickPreview(true);
-                } else {
-                    toast.error("Une erreur est survenue, veuillez réessayer ultérieure");
-                };
-            });
-        };
     }
 
     useEffect(() => {
@@ -67,22 +54,17 @@ export default function PublicHome() {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        fetchProduct();
-    }, [id]);
-
     return (
         <div className="mx-auto">
 
             {/* QuickPreview */}
-            {!Utils.isEmpty(product) && (
+            {!Utils.isEmpty(productPreview) && (
                 <QuickPreview
-                    product={product}
-                    open={displayQuickPreview}
+                    product={productPreview}
+                    open={!!productPreview}
                     onClose={() => {
-                        setDisplayQuickPreview(false);
+                        setProductPreview(null);
                         navigate(routes.HOME);
-                        fetchProducts();
                     }}
                     onAddCarts={(productAdded) => {
                         const existingProductIndex = carts.findIndex(item => item.id === productAdded.id);
@@ -97,8 +79,7 @@ export default function PublicHome() {
                             setCarts([...carts, productAdded]);
                         }
                         navigate(routes.HOME);
-                        setDisplayQuickPreview(false);
-                        fetchProducts();
+                        setProductPreview(null);
                     }}
                 />
             )}
@@ -154,7 +135,13 @@ export default function PublicHome() {
                         className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8"
                     >
                         {products && products.map((product) => (
-                            <Link key={product.id} to={routes.HOME + "/" + product.id} className="group">
+                            <Link
+                                key={product.id}
+                                to={Utils.addQueryParam(routes.HOME, 'productId', product?.id?.toString())}
+                                onClick={() => {
+                                    setProductPreview(product);
+                                }}
+                            >
                                 <div
                                     className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7"
                                     data-aos="zoom-in"
@@ -205,7 +192,7 @@ export default function PublicHome() {
                         ))}
                     </div>
                     : <div className="space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:space-y-0">
-                        {categories.map((category) => (
+                        {categories?.slice(0, 3)?.map((category) => (
                             <div data-aos="zoom-in" key={category?.id} className="group relative">
                                 <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
                                     <Link to={Utils.addQueryParam(routes.SHOP, 'categoryId', category?.id)}>

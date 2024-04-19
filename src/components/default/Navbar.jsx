@@ -1,6 +1,6 @@
-import { Fragment, useState } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useEffect, useState } from 'react'
+import { Disclosure, Menu } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import routes from "../../routes/routes.js"
 import { Button } from 'flowbite-react'
@@ -11,10 +11,15 @@ import { useCarts } from '../../provider/CartProvider.js'
 import Utils from '../../utils/Utils.js'
 
 export default function Navbar({ isConnected, children }) {
-    const location = useLocation();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const navigate = useNavigate();
     const { carts } = useCarts();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const query = new URLSearchParams(location.search);
+
+    useEffect(() => {
+        setIsDrawerOpen(query.get('isAddingProductToCard') === 'true');
+    }, [query.get('isAddingProductToCard')]);
 
     if (isConnected) {
         return (

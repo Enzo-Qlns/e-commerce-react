@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import Card from "../../../components/profile/Card";
-import { Button, FileInput, Label, TextInput } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
 import Utils from "../../../utils/Utils";
 import userService from "../../../api/userService";
 import { toast } from "react-toastify";
-import fileService from "../../../api/fileService";
 import { AiOutlineLoading } from "react-icons/ai";
 import { useAuth } from "../../../provider/AuthProvider";
 import { useProgressBar } from "../../../provider/ProgressBarProvider";
@@ -13,36 +12,19 @@ export default function Profile() {
     const { user: userNotParsed, setUser, setAccessToken, setRefreshToken } = useAuth();
     const [user, setUserData] = useState("");
     const [isEditMode, setIsEditMode] = useState(false);
-    const [imagePreview, setImagePreview] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const { displayProgressBar } = useProgressBar();
 
-    const fetchUpdateProfile = (name, email) => {
+    const fetchUpdateProfile = (name, email, avatar) => {
         setIsLoading(true);
 
-        userService.update_profile(user.id, name, email, (statusCode, jsonRes) => {
+        userService.update_profile(user.id, name, email, avatar, (statusCode, jsonRes) => {
             setIsEditMode(false);
             setIsLoading(false);
 
             if (200 === statusCode) {
                 setUser(JSON.stringify(jsonRes));
                 setUserData(jsonRes);
-            } else if (401 === statusCode) {
-                toast.error("Session expirée");
-            } else {
-                toast.error("Une erreur est survenue, veuillez réessayer plus tard");
-            }
-        })
-    }
-    const fetchUpdateAvatar = (avatar) => {
-        setIsLoading(true);
-
-        userService.update_avatar(user.id, avatar, (statusCode, jsonRes) => {
-            setIsEditMode(false);
-            setIsLoading(false);
-
-            if (200 === statusCode) {
-                setUser(jsonRes);
             } else if (401 === statusCode) {
                 toast.error("Session expirée");
             } else {
@@ -57,40 +39,10 @@ export default function Profile() {
         const data = new FormData(event.currentTarget);
         event.preventDefault();
 
-        let file = data.get('file');
-
-        // Update avatar
-        if (!Utils.isEmpty(file) && file?.size !== 0) {
-            fileService.upload_file(file, (statusCode, jsonRes) => {
-                if (statusCode === 200) {
-                    fetchUpdateAvatar(jsonRes.location);
-                } else {
-                    toast.error("Une erreur est survenue, veuillez réessayer plus tard");
-                }
-            });
-        };
-
         // Update profile
-        if (!Utils.isEmpty(data.get('name'), data.get('email'))) {
-            fetchUpdateProfile(data.get('name'), data.get('email'));
+        if (!Utils.isEmpty(data.get('name'), data.get('email'), data.get('avatar'))) {
+            fetchUpdateProfile(data.get('name'), data.get('email'), data.get('avatar'));
         }
-    }
-
-    const previewFile = (e) => {
-        // Reading New File (open file Picker Box)
-        const reader = new FileReader();
-        // Gettting Selected File (user can select multiple but we are choosing only one)
-        const selectedFile = e.target.files[0];
-        if (selectedFile) {
-            reader.readAsDataURL(selectedFile);
-        }
-        // As the File loaded then set the stage as per the file type
-        reader.onload = (readerEvent) => {
-            if (selectedFile.type.includes("image")) {
-                setImagePreview(readerEvent.target.result);
-            }
-
-        };
     }
 
     useEffect(() => {
@@ -109,7 +61,7 @@ export default function Profile() {
                     <form className="flex flex-col items-center" onSubmit={submitProfile} encType="multipart/form-data">
                         {isEditMode
                             ? <div className="flex flex-col gap-2 w-9/12">
-                                <div className="flex w-full items-center justify-center">
+                                {/* <div className="flex w-full items-center justify-center">
                                     <Label
                                         htmlFor="dropzone-file"
                                         className="flex h-26 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
@@ -140,7 +92,15 @@ export default function Profile() {
                                         </div>
                                         <FileInput onChange={previewFile} name="file" id="dropzone-file" className="hidden" />
                                     </Label>
-                                </div>
+                                </div> */}
+                                <TextInput
+                                    type="text"
+                                    id="small"
+                                    sizing="sm"
+                                    placeholder="avatar"
+                                    name="avatar"
+                                    defaultValue={user.avatar}
+                                />
                                 <TextInput
                                     type="text"
                                     id="small"

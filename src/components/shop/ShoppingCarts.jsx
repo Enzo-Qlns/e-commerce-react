@@ -1,17 +1,27 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { useCarts } from '../../provider/CartProvider'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import routes from '../../routes/routes'
+import { useAuth } from '../../provider/AuthProvider'
+import Utils from '../../utils/Utils'
 
 export default function ShoppingCarts({ open, setOpen }) {
   const { carts, removeCart } = useCarts();
+  const { user } = useAuth();
   const total = carts?.reduce((accumulator, currentItem) => accumulator + (currentItem.price * currentItem.quantity), 0);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleClose = () => {
+    navigate(location.pathname);
+    setOpen(false);
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
+      <Dialog as="div" className="relative z-10" onClose={handleClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-in-out duration-500"
@@ -45,7 +55,7 @@ export default function ShoppingCarts({ open, setOpen }) {
                           <button
                             type="button"
                             className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
-                            onClick={() => setOpen(false)}
+                            onClick={handleClose}
                           >
                             <span className="absolute -inset-0.5" />
                             <span className="sr-only">Close panel</span>
@@ -71,7 +81,7 @@ export default function ShoppingCarts({ open, setOpen }) {
                                   <div>
                                     <div className="flex justify-between text-base font-medium text-gray-900">
                                       <h3>
-                                        <Link onClick={() => setOpen(false)} to={routes.HOME + "/" + cart.id}>{cart?.title}</Link>
+                                        <Link onClick={handleClose} to={routes.HOME + "/" + cart.id}>{cart?.title}</Link>
                                       </h3>
                                       <p className="ml-4">{cart?.price}€</p>
                                     </div>
@@ -79,7 +89,6 @@ export default function ShoppingCarts({ open, setOpen }) {
                                   </div>
                                   <div className="flex flex-1 items-end justify-between text-sm">
                                     <p className="text-gray-500">Qty {cart?.quantity}</p>
-
                                     <div className="flex">
                                       <button
                                         type="button"
@@ -106,12 +115,13 @@ export default function ShoppingCarts({ open, setOpen }) {
                         </p>
                       </div>
                       <div className="mt-6">
-                        <a
-                          href="#"
+                        <Link
                           className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                          to={!!user ? routes.SUMMARY : Utils.addQueryParam(routes.AUTH, 'redirect', 'no-connected')}
+                          onClick={handleClose}
                         >
                           Paiement
-                        </a>
+                        </Link>
                       </div>
                       <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                         <p>
@@ -119,7 +129,7 @@ export default function ShoppingCarts({ open, setOpen }) {
                           <button
                             type="button"
                             className="font-medium text-indigo-600 hover:text-indigo-500"
-                            onClick={() => setOpen(false)}
+                            onClick={handleClose}
                           >
                             Continuer vos achats
                             <span aria-hidden="true"> &rarr;</span>
@@ -134,6 +144,6 @@ export default function ShoppingCarts({ open, setOpen }) {
           </div>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition.Root >
   )
 }

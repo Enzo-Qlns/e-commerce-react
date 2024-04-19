@@ -2,6 +2,8 @@ import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Badge, Carousel } from "flowbite-react";
+import Utils from '../../utils/Utils';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function QuickPreview({
     product,
@@ -10,6 +12,8 @@ export default function QuickPreview({
     onAddCarts,
 }) {
     const [quantity, setQuantity] = useState(1)
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const resetQuantity = () => {
         setTimeout(() => {
@@ -28,6 +32,7 @@ export default function QuickPreview({
 
         product["quantity"] = Number.parseInt(data.get('quantity'))
         onAddCarts(product);
+        navigate(Utils.addQueryParam(location.pathname, 'isAddingProductToCard', true));
         resetQuantity();
     }
 

@@ -10,7 +10,11 @@ const CartsProvider = ({ children }) => {
     };
 
     const removeCart = (cartToRemove) => {
-        setCarts_(carts.filter(cart => cart.id !== cartToRemove.id));
+        if (cartToRemove) {
+            setCarts_(carts.filter(cart => cart?.id !== cartToRemove?.id));
+        } else {
+            setCarts_([]);
+        }
     }
 
     useEffect(() => {
@@ -28,6 +32,7 @@ const CartsProvider = ({ children }) => {
             setCarts,
             removeCart
         }),
+        // eslint-disable-next-line
         [carts]
     );
 

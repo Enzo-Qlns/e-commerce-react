@@ -4,12 +4,10 @@ import routes from "./routes";
 import { jwtDecode } from 'jwt-decode';
 import authService from "../api/authService";
 import Navbar from "../components/default/Navbar";
-import { useLocation } from "react-router-dom";
 
 export const ProtectedRoute = () => {
     const { accessToken, refreshToken, user, setAccessToken, setRefreshToken } = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
 
     // Check if the user is authenticated
     if (!accessToken) {
@@ -25,7 +23,7 @@ export const ProtectedRoute = () => {
     if (refreshToken) {
         const exp = new Date(jwtDecode(accessToken)?.exp * 1000);
         const currentDate = new Date();
-        const remember_me = localStorage.getItem("remember_me") === "true" ? true : false;
+        const remember_me = localStorage.getItem("remember_me") === "true";
         if (exp < currentDate) {
             if (remember_me) {
                 authService.refresh_token(refreshToken, (statusCode, jsonRes) => {
@@ -41,6 +39,7 @@ export const ProtectedRoute = () => {
             };
         };
     }
+    
     // If authenticated, render the child routes
     return (
         <Navbar isConnected={true}>

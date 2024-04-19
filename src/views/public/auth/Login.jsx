@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../provider/AuthProvider';
 import routes from '../../../routes/routes';
 import authService from '../../../api/authService';
@@ -13,6 +13,9 @@ export default function Login() {
     const [error, setError] = useState(null);
     const { setAccessToken, setRefreshToken, setUser } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const noConnected = query.get('redirect') === 'no-connected';
 
     const fetchProfile = (access_token, refresh_token) => {
         authService.profile(access_token, (statusCode, jsonRes) => {
@@ -22,7 +25,7 @@ export default function Login() {
                 setAccessToken(access_token);
                 setRefreshToken(refresh_token);
 
-                navigate(routes.HOME);
+                navigate(noConnected ? routes.SUMMARY : routes.HOME);
             } else if (401 === statusCode) {
                 setLoading(false);
                 setError('Identifiant ou mot de passe invalide');
@@ -58,6 +61,10 @@ export default function Login() {
             <div href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
                 E-commerce React
             </div>
+            {noConnected && (
+                <div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                    <span className="font-medium">Information !</span> Veuillez vous connecter avant de procéder au paiement.
+                </div>)}
             <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                     <h1 className="text-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -113,13 +120,8 @@ export default function Login() {
                                     <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">Se souvenir de moi</label>
                                 </div>
                             </div>
-                            <a href="#" className="text-sm font-medium text-blue-500 hover:underline dark:text-blue-400">Mot de passe oublié ?</a>
+                            <Link href="#" className="text-sm font-medium text-blue-500 hover:underline dark:text-blue-400">Mot de passe oublié ?</Link>
                         </div>
-                        {/* <button
-                            className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        >
-                            Se connecter
-                        </button> */}
                         <Button
                             className="border-transparent focus:border-transparent focus:ring-0 w-full"
                             type="submit"

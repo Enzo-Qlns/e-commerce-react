@@ -1,15 +1,17 @@
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
 import { useAuth } from "../provider/AuthProvider";
 import { ProtectedRoute } from "./protectedRoute";
+import Navbar from "../components/default/Navbar.jsx";
 import routes from "./routes";
 import Oops404 from "../views/error/Oops404.jsx";
 import Login from "../views/public/auth/Login.jsx";
 import Register from "../views/public/auth/Register.jsx";
 import Profile from "../views/private/profile/Profile.jsx";
+import PrivateHome from "../views/private/home/Home.jsx";
 import PublicHome from "../views/public/home/Home.jsx";
-import PrivateHome from "../views/private/Home.jsx";
-import Navbar from "../components/default/Navbar.jsx";
-import Shop from "../views/public/shop/Shop.jsx";
+import PublicShop from "../views/public/shop/Shop.jsx";
+import PrivateShop from "../views/private/shop/Shop.jsx";
+import OrdreSummary from "../views/private/shop/OrderSummary.jsx";
 
 const Routes = () => {
     const { accessToken, user } = useAuth();
@@ -37,6 +39,14 @@ const Routes = () => {
                     element: <PrivateHome />,
                 },
                 {
+                    path: routes.SHOP,
+                    element: <PrivateShop />,
+                },
+                {
+                    path: routes.SUMMARY,
+                    element: <OrdreSummary />,
+                },
+                {
                     path: routes.PROFILE,
                     element: <Profile />,
                 },
@@ -55,12 +65,8 @@ const Routes = () => {
                     element: <PublicHome />,
                 },
                 {
-                    path: routes.HOME + "/:id",
-                    element: <PublicHome />,
-                },
-                {
                     path: routes.SHOP,
-                    element: <Shop />,
+                    element: <PublicShop />,
                 },
                 {
                     path: routes.AUTH,
