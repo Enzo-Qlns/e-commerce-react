@@ -216,6 +216,7 @@ export default function OrdreSummary() {
                                         type="submit"
                                         isProcessing={isLoading}
                                         processingSpinner={<AiOutlineLoading className="h-6 w-6 animate-spin" />}
+                                        disabled={carts?.length === 1}
                                     >
                                         Payer
                                     </Button>
